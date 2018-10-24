@@ -61,3 +61,19 @@ the response is
 }
 
 ```
+
+结果集中再查询
+```
+query mememomo{
+  todo(id: "T6334824724549167320"){
+		id,
+    text
+    user(ID:123){
+      id
+    }
+  }
+}
+
+
+
+```

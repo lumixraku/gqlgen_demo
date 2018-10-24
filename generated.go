@@ -32,6 +32,7 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Todo() TodoResolver
 }
 
 type DirectiveRoot struct {
@@ -48,11 +49,11 @@ type ComplexityRoot struct {
 	}
 
 	Todo struct {
-		Id       func(childComplexity int) int
-		Text     func(childComplexity int) int
-		Done     func(childComplexity int) int
-		User     func(childComplexity int) int
-		UserById func(childComplexity int, ID int) int
+		Id    func(childComplexity int) int
+		Text  func(childComplexity int) int
+		Done  func(childComplexity int) int
+		Users func(childComplexity int) int
+		User  func(childComplexity int, ID int) int
 	}
 
 	User struct {
@@ -67,6 +68,9 @@ type MutationResolver interface {
 type QueryResolver interface {
 	Todos(ctx context.Context) ([]Todo, error)
 	Todo(ctx context.Context, id string) (Todo, error)
+}
+type TodoResolver interface {
+	User(ctx context.Context, obj *Todo, ID int) (User, error)
 }
 
 func field_Mutation_createTodo_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
@@ -114,7 +118,7 @@ func field_Query___type_args(rawArgs map[string]interface{}) (map[string]interfa
 
 }
 
-func field_Todo_userById_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func field_Todo_user_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
 	var arg0 int
 	if tmp, ok := rawArgs["ID"]; ok {
@@ -224,24 +228,24 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Todo.Done(childComplexity), true
 
+	case "Todo.users":
+		if e.complexity.Todo.Users == nil {
+			break
+		}
+
+		return e.complexity.Todo.Users(childComplexity), true
+
 	case "Todo.user":
 		if e.complexity.Todo.User == nil {
 			break
 		}
 
-		return e.complexity.Todo.User(childComplexity), true
-
-	case "Todo.userById":
-		if e.complexity.Todo.UserById == nil {
-			break
-		}
-
-		args, err := field_Todo_userById_args(rawArgs)
+		args, err := field_Todo_user_args(rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Todo.UserById(childComplexity, args["ID"].(int)), true
+		return e.complexity.Todo.User(childComplexity, args["ID"].(int)), true
 
 	case "User.id":
 		if e.complexity.User.Id == nil {
@@ -567,6 +571,7 @@ var todoImplementors = []string{"Todo"}
 func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj *Todo) graphql.Marshaler {
 	fields := graphql.CollectFields(ctx, sel, todoImplementors)
 
+	var wg sync.WaitGroup
 	out := graphql.NewOrderedMap(len(fields))
 	invalid := false
 	for i, field := range fields {
@@ -590,21 +595,25 @@ func (ec *executionContext) _Todo(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "users":
+			out.Values[i] = ec._Todo_users(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "user":
-			out.Values[i] = ec._Todo_user(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "userById":
-			out.Values[i] = ec._Todo_userById(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
+			wg.Add(1)
+			go func(i int, field graphql.CollectedField) {
+				out.Values[i] = ec._Todo_user(ctx, field, obj)
+				if out.Values[i] == graphql.Null {
+					invalid = true
+				}
+				wg.Done()
+			}(i, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
-
+	wg.Wait()
 	if invalid {
 		return graphql.Null
 	}
@@ -681,7 +690,7 @@ func (ec *executionContext) _Todo_done(ctx context.Context, field graphql.Collec
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.CollectedField, obj *Todo) graphql.Marshaler {
+func (ec *executionContext) _Todo_users(ctx context.Context, field graphql.CollectedField, obj *Todo) graphql.Marshaler {
 	rctx := &graphql.ResolverContext{
 		Object: "Todo",
 		Args:   nil,
@@ -690,7 +699,7 @@ func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.Collec
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.User, nil
+		return obj.Users, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -705,9 +714,9 @@ func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.Collec
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Todo_userById(ctx context.Context, field graphql.CollectedField, obj *Todo) graphql.Marshaler {
+func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.CollectedField, obj *Todo) graphql.Marshaler {
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := field_Todo_userById_args(rawArgs)
+	args, err := field_Todo_user_args(rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -720,7 +729,7 @@ func (ec *executionContext) _Todo_userById(ctx context.Context, field graphql.Co
 	ctx = graphql.WithResolverContext(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.UserByID, nil
+		return ec.resolvers.Todo().User(rctx, obj, args["ID"].(int))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2180,8 +2189,8 @@ type Todo {
   id: ID!
   text: String!
   done: Boolean!
-  user: User!
-  userById(ID: Int!): User!
+  users: User!
+  user(ID: Int!): User!
 }
 
 type User {
