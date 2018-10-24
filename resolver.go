@@ -6,6 +6,8 @@ import (
 	context "context"
 	"fmt"
 	"math/rand"
+
+	"code.byted.org/gopkg/logs"
 )
 
 type Resolver struct {
@@ -21,12 +23,12 @@ func (r *Resolver) Query() QueryResolver {
 }
 
 type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input NewTodo) (Todo, error) {
 	newTodo := Todo{
 		User: User{
-			ID: input.UserID,
+			ID:   input.UserID,
+			Name: "name ::" + input.Text,
 		},
 		Text: input.Text,
 		ID:   fmt.Sprintf("T%d", rand.Int()),
@@ -37,17 +39,17 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input NewTodo) (Todo,
 	return newTodo, nil
 }
 
+type queryResolver struct{ *Resolver }
+
 func (r *queryResolver) Todos(ctx context.Context) ([]Todo, error) {
-	// return []Todo{Todo{ID: "1"}}, nil
 	fmt.Printf("%+v", r.todos)
 	return r.todos, nil
 }
-
-func (r *queryResolver) Todo(ctx context.Context) (Todo, error) {
+func (r *queryResolver) Todo(ctx context.Context, id string) (Todo, error) {
 	// panic("not implemented")
 	if len(r.todos) > 0 {
+		logs.Debug("%+v", r.todos)
 		return r.todos[0], nil
-
 	} else {
 		return Todo{ID: "1111"}, nil
 	}
