@@ -6,7 +6,7 @@ import (
 	http "net/http"
 	os "os"
 
-	handler "github.com/99designs/gqlgen/handler"
+	handler "github.com/vektah/gqlgen/handler"
 )
 
 const defaultPort = "8080"
@@ -18,7 +18,7 @@ func main() {
 	}
 
 	http.Handle("/", handler.Playground("GraphQL playground", "/query"))
-	http.Handle("/query", handler.GraphQL(gqlgen.NewExecutableSchema(gqlgen.Config{Resolvers: &gqlgen.Resolver{}})))
+	http.Handle("/query", handler.GraphQL(gqlgen.MakeExecutableSchema(gqlgen.New())))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
