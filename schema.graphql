@@ -1,30 +1,122 @@
-# GraphQL schema example
-#
-# https://gqlgen.com/getting-started/
+type Query {
+  viewer: User!
+  sites(type: SiteType = TETRIS, skip: Int, after: String, before: String, first: Int, last: Int): SiteConnection!
+  converts(type: SiteType = TETRIS, skip: Int, after: String, before: String, first: Int, last: Int): ConvertConnection!
+}
 
-type Todo {
+type Mutation {
+  createJSConvert(input: JSConvert): Convert!
+  updateContainer(convertID: Int!, convertName: String):Convert!
+}
+
+# 转化目标
+enum ExternalAction{
+  Phone #1  电话拨打
+  Form #2表单提交
+  MapSearch #3地图搜索
+  DownloadFinish  #4下载完成
+  Button #按钮5button
+  Xpath  #6xpath类型转换
+  View #7  关键页面浏览
+  Active #8激活
+  DownloadStart  #9下载按钮download_start
+  QQ  #10qq咨询
+  Lottery #11抽奖
+  Vote #12投票
+
+}
+
+enum SiteType {
+  TETRIS
+  TEMAI
+}
+
+interface Node {
   id: ID!
-  text: String!
-  done: Boolean!
-  users: User!
-  user(ID: Int!): User!
+}
+
+
+type Convert implements Node{
+  id: ID!
+
+  advertiserID: Int
+  appId: String
+  convertAttribution: Int
+  convertDataType: Int
+  convertItunesId: Int
+  convertPackageName: String
+  convertStatus: Int
+  convertType: Int
+  convertValue: Int
+  convertXpathUrl: String
+  convertXpathValue: String
+  createChannel: Int
+  createTime: Time
+  data: String
+  downloadUrlStatus: Int
+  externalAction: Int
+  externalActions: String
+  name: String!
+  status: Int
+  statusModifyTime: Int
+}
+
+interface ConvertInput{
+  name: String!
+  externalAction: ExternalAction
+}
+input JSConvert {
+  name: String!
+  externalAction: ExternalAction
+}
+
+type ConvertConnection {
+  edges: [ConvertEdge!]!
+  pageInfo: PageInfo!
+  aggregate: AggregateSite!
+}
+type ConvertEdge{
+  node: Convert!
+  cursor: ID!
 }
 
 type User {
   id: ID!
+  advertiserID: ID!
+}
+
+
+
+type SiteConnection {
+  edges: [SiteEdge!]!
+  pageInfo: PageInfo!
+  aggregate: AggregateSite!
+}
+
+type SiteEdge {
+  node: Site!
+  cursor: ID!
+}
+
+type Site implements Node {
+  id: ID!
+  url: String!
   name: String!
+  image: String!
+  createAt: Time!
 }
 
-type Query {
-  todos: [Todo!]!
-  todo(id: ID!): Todo!
+type AggregateSite {
+  count: Int!
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
+
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
 }
 
-type Mutation {
-  createTodo(input: NewTodo!): Todo!
-}
+scalar Time

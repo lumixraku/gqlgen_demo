@@ -77,3 +77,34 @@ query mememomo{
 
 
 ```
+
+
+
+```
+# Try to write your query here
+# mutation{
+#   testtt(name:""){
+#     id
+#   }
+# }
+
+
+query{
+  viewer{
+    id
+  }
+}
+```
+
+```
+mutation{
+
+  createTodo(input: {
+    text: "",
+    userId: ""
+  }){
+    id
+  }
+}
+
+```  this is ok
