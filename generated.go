@@ -34,18 +34,17 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
-	SiteConnection() SiteConnectionResolver
 }
 
 type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
-	AggregateSite struct {
+	AggregateConvert struct {
 		Count func(childComplexity int) int
 	}
 
-	Convert struct {
+	AppConvert struct {
 		Id                 func(childComplexity int) int
 		AdvertiserId       func(childComplexity int) int
 		AppId              func(childComplexity int) int
@@ -56,12 +55,28 @@ type ComplexityRoot struct {
 		ConvertStatus      func(childComplexity int) int
 		ConvertType        func(childComplexity int) int
 		ConvertValue       func(childComplexity int) int
-		ConvertXpathUrl    func(childComplexity int) int
-		ConvertXpathValue  func(childComplexity int) int
 		CreateChannel      func(childComplexity int) int
 		CreateTime         func(childComplexity int) int
 		Data               func(childComplexity int) int
 		DownloadUrlStatus  func(childComplexity int) int
+		ExternalAction     func(childComplexity int) int
+		ExternalActions    func(childComplexity int) int
+		Name               func(childComplexity int) int
+		Status             func(childComplexity int) int
+		StatusModifyTime   func(childComplexity int) int
+	}
+
+	Convert struct {
+		Id                 func(childComplexity int) int
+		AdvertiserId       func(childComplexity int) int
+		ConvertAttribution func(childComplexity int) int
+		ConvertDataType    func(childComplexity int) int
+		ConvertStatus      func(childComplexity int) int
+		ConvertType        func(childComplexity int) int
+		ConvertValue       func(childComplexity int) int
+		CreateChannel      func(childComplexity int) int
+		CreateTime         func(childComplexity int) int
+		Data               func(childComplexity int) int
 		ExternalAction     func(childComplexity int) int
 		ExternalActions    func(childComplexity int) int
 		Name               func(childComplexity int) int
@@ -81,8 +96,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateJsconvert func(childComplexity int, input *JSConvert) int
-		UpdateContainer func(childComplexity int, convertID int, convertName *string) int
+		CreateJsconvert func(childComplexity int, input *JSCreateInput) int
+		UpdateJsconvert func(childComplexity int, input *JSUpdateInput, where *ConvertWhereInput) int
+		DeleteJsconvert func(childComplexity int, where *ConvertWhereInput) int
 	}
 
 	PageInfo struct {
@@ -93,59 +109,52 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Viewer   func(childComplexity int) int
-		Sites    func(childComplexity int, typeArg *SiteType, skip *int, after *string, before *string, first *int, last *int) int
-		Converts func(childComplexity int, typeArg *SiteType, skip *int, after *string, before *string, first *int, last *int) int
-	}
-
-	Site struct {
-		Id       func(childComplexity int) int
-		Url      func(childComplexity int) int
-		Name     func(childComplexity int) int
-		Image    func(childComplexity int) int
-		CreateAt func(childComplexity int) int
-	}
-
-	SiteConnection struct {
-		Edges     func(childComplexity int) int
-		PageInfo  func(childComplexity int) int
-		Aggregate func(childComplexity int) int
-	}
-
-	SiteEdge struct {
-		Node   func(childComplexity int) int
-		Cursor func(childComplexity int) int
+		Converts func(childComplexity int, where *ConvertWhereInput, orderBy *ConvertOrderByInput, skip *int, after *string, before *string, first *int, last *int) int
 	}
 
 	User struct {
 		Id           func(childComplexity int) int
 		AdvertiserId func(childComplexity int) int
 	}
+
+	XpathConvert struct {
+		Id                 func(childComplexity int) int
+		AdvertiserId       func(childComplexity int) int
+		ConvertAttribution func(childComplexity int) int
+		ConvertDataType    func(childComplexity int) int
+		ConvertStatus      func(childComplexity int) int
+		ConvertType        func(childComplexity int) int
+		ConvertValue       func(childComplexity int) int
+		ConvertXpathUrl    func(childComplexity int) int
+		ConvertXpathValue  func(childComplexity int) int
+		CreateChannel      func(childComplexity int) int
+		CreateTime         func(childComplexity int) int
+		Data               func(childComplexity int) int
+		ExternalAction     func(childComplexity int) int
+		ExternalActions    func(childComplexity int) int
+		Name               func(childComplexity int) int
+		Status             func(childComplexity int) int
+		StatusModifyTime   func(childComplexity int) int
+	}
 }
 
 type MutationResolver interface {
-	CreateJSConvert(ctx context.Context, input *JSConvert) (Convert, error)
-	UpdateContainer(ctx context.Context, convertID int, convertName *string) (Convert, error)
+	CreateJSConvert(ctx context.Context, input *JSCreateInput) (Convert, error)
+	UpdateJSConvert(ctx context.Context, input *JSUpdateInput, where *ConvertWhereInput) (Convert, error)
+	DeleteJSConvert(ctx context.Context, where *ConvertWhereInput) (*Convert, error)
 }
 type QueryResolver interface {
-	Viewer(ctx context.Context) (User, error)
-	Sites(ctx context.Context, typeArg *SiteType, skip *int, after *string, before *string, first *int, last *int) (SiteConnection, error)
-	Converts(ctx context.Context, typeArg *SiteType, skip *int, after *string, before *string, first *int, last *int) (ConvertConnection, error)
-}
-type SiteConnectionResolver interface {
-	Edges(ctx context.Context, obj *SiteConnection) ([]SiteEdge, error)
-	PageInfo(ctx context.Context, obj *SiteConnection) (PageInfo, error)
-	Aggregate(ctx context.Context, obj *SiteConnection) (AggregateSite, error)
+	Converts(ctx context.Context, where *ConvertWhereInput, orderBy *ConvertOrderByInput, skip *int, after *string, before *string, first *int, last *int) (ConvertConnection, error)
 }
 
 func field_Mutation_createJSConvert_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 *JSConvert
+	var arg0 *JSCreateInput
 	if tmp, ok := rawArgs["input"]; ok {
 		var err error
-		var ptr1 JSConvert
+		var ptr1 JSCreateInput
 		if tmp != nil {
-			ptr1, err = UnmarshalJSConvert(tmp)
+			ptr1, err = UnmarshalJSCreateInput(tmp)
 			arg0 = &ptr1
 		}
 
@@ -158,43 +167,14 @@ func field_Mutation_createJSConvert_args(rawArgs map[string]interface{}) (map[st
 
 }
 
-func field_Mutation_updateContainer_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func field_Mutation_updateJSConvert_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 int
-	if tmp, ok := rawArgs["convertID"]; ok {
+	var arg0 *JSUpdateInput
+	if tmp, ok := rawArgs["input"]; ok {
 		var err error
-		arg0, err = graphql.UnmarshalInt(tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["convertID"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["convertName"]; ok {
-		var err error
-		var ptr1 string
+		var ptr1 JSUpdateInput
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalString(tmp)
-			arg1 = &ptr1
-		}
-
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["convertName"] = arg1
-	return args, nil
-
-}
-
-func field_Query_sites_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	args := map[string]interface{}{}
-	var arg0 *SiteType
-	if tmp, ok := rawArgs["type"]; ok {
-		var err error
-		var ptr1 SiteType
-		if tmp != nil {
-			err = (&ptr1).UnmarshalGQL(tmp)
+			ptr1, err = UnmarshalJSUpdateInput(tmp)
 			arg0 = &ptr1
 		}
 
@@ -202,13 +182,13 @@ func field_Query_sites_args(rawArgs map[string]interface{}) (map[string]interfac
 			return nil, err
 		}
 	}
-	args["type"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["skip"]; ok {
+	args["input"] = arg0
+	var arg1 *ConvertWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
 		var err error
-		var ptr1 int
+		var ptr1 ConvertWhereInput
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalInt(tmp)
+			ptr1, err = UnmarshalConvertWhereInput(tmp)
 			arg1 = &ptr1
 		}
 
@@ -216,75 +196,39 @@ func field_Query_sites_args(rawArgs map[string]interface{}) (map[string]interfac
 			return nil, err
 		}
 	}
-	args["skip"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["after"]; ok {
+	args["where"] = arg1
+	return args, nil
+
+}
+
+func field_Mutation_deleteJSConvert_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	args := map[string]interface{}{}
+	var arg0 *ConvertWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
 		var err error
-		var ptr1 string
+		var ptr1 ConvertWhereInput
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalString(tmp)
-			arg2 = &ptr1
+			ptr1, err = UnmarshalConvertWhereInput(tmp)
+			arg0 = &ptr1
 		}
 
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["after"] = arg2
-	var arg3 *string
-	if tmp, ok := rawArgs["before"]; ok {
-		var err error
-		var ptr1 string
-		if tmp != nil {
-			ptr1, err = graphql.UnmarshalString(tmp)
-			arg3 = &ptr1
-		}
-
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["before"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		var err error
-		var ptr1 int
-		if tmp != nil {
-			ptr1, err = graphql.UnmarshalInt(tmp)
-			arg4 = &ptr1
-		}
-
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg4
-	var arg5 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		var err error
-		var ptr1 int
-		if tmp != nil {
-			ptr1, err = graphql.UnmarshalInt(tmp)
-			arg5 = &ptr1
-		}
-
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["last"] = arg5
+	args["where"] = arg0
 	return args, nil
 
 }
 
 func field_Query_converts_args(rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	args := map[string]interface{}{}
-	var arg0 *SiteType
-	if tmp, ok := rawArgs["type"]; ok {
+	var arg0 *ConvertWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
 		var err error
-		var ptr1 SiteType
+		var ptr1 ConvertWhereInput
 		if tmp != nil {
-			err = (&ptr1).UnmarshalGQL(tmp)
+			ptr1, err = UnmarshalConvertWhereInput(tmp)
 			arg0 = &ptr1
 		}
 
@@ -292,13 +236,13 @@ func field_Query_converts_args(rawArgs map[string]interface{}) (map[string]inter
 			return nil, err
 		}
 	}
-	args["type"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["skip"]; ok {
+	args["where"] = arg0
+	var arg1 *ConvertOrderByInput
+	if tmp, ok := rawArgs["orderBy"]; ok {
 		var err error
-		var ptr1 int
+		var ptr1 ConvertOrderByInput
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalInt(tmp)
+			err = (&ptr1).UnmarshalGQL(tmp)
 			arg1 = &ptr1
 		}
 
@@ -306,13 +250,13 @@ func field_Query_converts_args(rawArgs map[string]interface{}) (map[string]inter
 			return nil, err
 		}
 	}
-	args["skip"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["after"]; ok {
+	args["orderBy"] = arg1
+	var arg2 *int
+	if tmp, ok := rawArgs["skip"]; ok {
 		var err error
-		var ptr1 string
+		var ptr1 int
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalString(tmp)
+			ptr1, err = graphql.UnmarshalInt(tmp)
 			arg2 = &ptr1
 		}
 
@@ -320,9 +264,9 @@ func field_Query_converts_args(rawArgs map[string]interface{}) (map[string]inter
 			return nil, err
 		}
 	}
-	args["after"] = arg2
+	args["skip"] = arg2
 	var arg3 *string
-	if tmp, ok := rawArgs["before"]; ok {
+	if tmp, ok := rawArgs["after"]; ok {
 		var err error
 		var ptr1 string
 		if tmp != nil {
@@ -334,13 +278,13 @@ func field_Query_converts_args(rawArgs map[string]interface{}) (map[string]inter
 			return nil, err
 		}
 	}
-	args["before"] = arg3
-	var arg4 *int
-	if tmp, ok := rawArgs["first"]; ok {
+	args["after"] = arg3
+	var arg4 *string
+	if tmp, ok := rawArgs["before"]; ok {
 		var err error
-		var ptr1 int
+		var ptr1 string
 		if tmp != nil {
-			ptr1, err = graphql.UnmarshalInt(tmp)
+			ptr1, err = graphql.UnmarshalString(tmp)
 			arg4 = &ptr1
 		}
 
@@ -348,9 +292,9 @@ func field_Query_converts_args(rawArgs map[string]interface{}) (map[string]inter
 			return nil, err
 		}
 	}
-	args["first"] = arg4
+	args["before"] = arg4
 	var arg5 *int
-	if tmp, ok := rawArgs["last"]; ok {
+	if tmp, ok := rawArgs["first"]; ok {
 		var err error
 		var ptr1 int
 		if tmp != nil {
@@ -362,7 +306,21 @@ func field_Query_converts_args(rawArgs map[string]interface{}) (map[string]inter
 			return nil, err
 		}
 	}
-	args["last"] = arg5
+	args["first"] = arg5
+	var arg6 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		var err error
+		var ptr1 int
+		if tmp != nil {
+			ptr1, err = graphql.UnmarshalInt(tmp)
+			arg6 = &ptr1
+		}
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg6
 	return args, nil
 
 }
@@ -425,12 +383,145 @@ func (e *executableSchema) Schema() *ast.Schema {
 func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
 	switch typeName + "." + field {
 
-	case "AggregateSite.count":
-		if e.complexity.AggregateSite.Count == nil {
+	case "AggregateConvert.count":
+		if e.complexity.AggregateConvert.Count == nil {
 			break
 		}
 
-		return e.complexity.AggregateSite.Count(childComplexity), true
+		return e.complexity.AggregateConvert.Count(childComplexity), true
+
+	case "AppConvert.id":
+		if e.complexity.AppConvert.Id == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.Id(childComplexity), true
+
+	case "AppConvert.advertiserID":
+		if e.complexity.AppConvert.AdvertiserId == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.AdvertiserId(childComplexity), true
+
+	case "AppConvert.appId":
+		if e.complexity.AppConvert.AppId == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.AppId(childComplexity), true
+
+	case "AppConvert.convertAttribution":
+		if e.complexity.AppConvert.ConvertAttribution == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.ConvertAttribution(childComplexity), true
+
+	case "AppConvert.convertDataType":
+		if e.complexity.AppConvert.ConvertDataType == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.ConvertDataType(childComplexity), true
+
+	case "AppConvert.convertItunesId":
+		if e.complexity.AppConvert.ConvertItunesId == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.ConvertItunesId(childComplexity), true
+
+	case "AppConvert.convertPackageName":
+		if e.complexity.AppConvert.ConvertPackageName == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.ConvertPackageName(childComplexity), true
+
+	case "AppConvert.convertStatus":
+		if e.complexity.AppConvert.ConvertStatus == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.ConvertStatus(childComplexity), true
+
+	case "AppConvert.convertType":
+		if e.complexity.AppConvert.ConvertType == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.ConvertType(childComplexity), true
+
+	case "AppConvert.convertValue":
+		if e.complexity.AppConvert.ConvertValue == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.ConvertValue(childComplexity), true
+
+	case "AppConvert.createChannel":
+		if e.complexity.AppConvert.CreateChannel == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.CreateChannel(childComplexity), true
+
+	case "AppConvert.createTime":
+		if e.complexity.AppConvert.CreateTime == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.CreateTime(childComplexity), true
+
+	case "AppConvert.data":
+		if e.complexity.AppConvert.Data == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.Data(childComplexity), true
+
+	case "AppConvert.downloadUrlStatus":
+		if e.complexity.AppConvert.DownloadUrlStatus == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.DownloadUrlStatus(childComplexity), true
+
+	case "AppConvert.externalAction":
+		if e.complexity.AppConvert.ExternalAction == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.ExternalAction(childComplexity), true
+
+	case "AppConvert.externalActions":
+		if e.complexity.AppConvert.ExternalActions == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.ExternalActions(childComplexity), true
+
+	case "AppConvert.name":
+		if e.complexity.AppConvert.Name == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.Name(childComplexity), true
+
+	case "AppConvert.status":
+		if e.complexity.AppConvert.Status == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.Status(childComplexity), true
+
+	case "AppConvert.statusModifyTime":
+		if e.complexity.AppConvert.StatusModifyTime == nil {
+			break
+		}
+
+		return e.complexity.AppConvert.StatusModifyTime(childComplexity), true
 
 	case "Convert.id":
 		if e.complexity.Convert.Id == nil {
@@ -439,19 +530,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Convert.Id(childComplexity), true
 
-	case "Convert.advertiserID":
+	case "Convert.advertiserId":
 		if e.complexity.Convert.AdvertiserId == nil {
 			break
 		}
 
 		return e.complexity.Convert.AdvertiserId(childComplexity), true
-
-	case "Convert.appId":
-		if e.complexity.Convert.AppId == nil {
-			break
-		}
-
-		return e.complexity.Convert.AppId(childComplexity), true
 
 	case "Convert.convertAttribution":
 		if e.complexity.Convert.ConvertAttribution == nil {
@@ -466,20 +550,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Convert.ConvertDataType(childComplexity), true
-
-	case "Convert.convertItunesId":
-		if e.complexity.Convert.ConvertItunesId == nil {
-			break
-		}
-
-		return e.complexity.Convert.ConvertItunesId(childComplexity), true
-
-	case "Convert.convertPackageName":
-		if e.complexity.Convert.ConvertPackageName == nil {
-			break
-		}
-
-		return e.complexity.Convert.ConvertPackageName(childComplexity), true
 
 	case "Convert.convertStatus":
 		if e.complexity.Convert.ConvertStatus == nil {
@@ -502,20 +572,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Convert.ConvertValue(childComplexity), true
 
-	case "Convert.convertXpathUrl":
-		if e.complexity.Convert.ConvertXpathUrl == nil {
-			break
-		}
-
-		return e.complexity.Convert.ConvertXpathUrl(childComplexity), true
-
-	case "Convert.convertXpathValue":
-		if e.complexity.Convert.ConvertXpathValue == nil {
-			break
-		}
-
-		return e.complexity.Convert.ConvertXpathValue(childComplexity), true
-
 	case "Convert.createChannel":
 		if e.complexity.Convert.CreateChannel == nil {
 			break
@@ -536,13 +592,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Convert.Data(childComplexity), true
-
-	case "Convert.downloadUrlStatus":
-		if e.complexity.Convert.DownloadUrlStatus == nil {
-			break
-		}
-
-		return e.complexity.Convert.DownloadUrlStatus(childComplexity), true
 
 	case "Convert.externalAction":
 		if e.complexity.Convert.ExternalAction == nil {
@@ -624,19 +673,31 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateJsconvert(childComplexity, args["input"].(*JSConvert)), true
+		return e.complexity.Mutation.CreateJsconvert(childComplexity, args["input"].(*JSCreateInput)), true
 
-	case "Mutation.updateContainer":
-		if e.complexity.Mutation.UpdateContainer == nil {
+	case "Mutation.updateJSConvert":
+		if e.complexity.Mutation.UpdateJsconvert == nil {
 			break
 		}
 
-		args, err := field_Mutation_updateContainer_args(rawArgs)
+		args, err := field_Mutation_updateJSConvert_args(rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateContainer(childComplexity, args["convertID"].(int), args["convertName"].(*string)), true
+		return e.complexity.Mutation.UpdateJsconvert(childComplexity, args["input"].(*JSUpdateInput), args["where"].(*ConvertWhereInput)), true
+
+	case "Mutation.deleteJSConvert":
+		if e.complexity.Mutation.DeleteJsconvert == nil {
+			break
+		}
+
+		args, err := field_Mutation_deleteJSConvert_args(rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteJsconvert(childComplexity, args["where"].(*ConvertWhereInput)), true
 
 	case "PageInfo.hasNextPage":
 		if e.complexity.PageInfo.HasNextPage == nil {
@@ -666,25 +727,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PageInfo.EndCursor(childComplexity), true
 
-	case "Query.viewer":
-		if e.complexity.Query.Viewer == nil {
-			break
-		}
-
-		return e.complexity.Query.Viewer(childComplexity), true
-
-	case "Query.sites":
-		if e.complexity.Query.Sites == nil {
-			break
-		}
-
-		args, err := field_Query_sites_args(rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Sites(childComplexity, args["type"].(*SiteType), args["skip"].(*int), args["after"].(*string), args["before"].(*string), args["first"].(*int), args["last"].(*int)), true
-
 	case "Query.converts":
 		if e.complexity.Query.Converts == nil {
 			break
@@ -695,77 +737,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Converts(childComplexity, args["type"].(*SiteType), args["skip"].(*int), args["after"].(*string), args["before"].(*string), args["first"].(*int), args["last"].(*int)), true
-
-	case "Site.id":
-		if e.complexity.Site.Id == nil {
-			break
-		}
-
-		return e.complexity.Site.Id(childComplexity), true
-
-	case "Site.url":
-		if e.complexity.Site.Url == nil {
-			break
-		}
-
-		return e.complexity.Site.Url(childComplexity), true
-
-	case "Site.name":
-		if e.complexity.Site.Name == nil {
-			break
-		}
-
-		return e.complexity.Site.Name(childComplexity), true
-
-	case "Site.image":
-		if e.complexity.Site.Image == nil {
-			break
-		}
-
-		return e.complexity.Site.Image(childComplexity), true
-
-	case "Site.createAt":
-		if e.complexity.Site.CreateAt == nil {
-			break
-		}
-
-		return e.complexity.Site.CreateAt(childComplexity), true
-
-	case "SiteConnection.edges":
-		if e.complexity.SiteConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.SiteConnection.Edges(childComplexity), true
-
-	case "SiteConnection.pageInfo":
-		if e.complexity.SiteConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.SiteConnection.PageInfo(childComplexity), true
-
-	case "SiteConnection.aggregate":
-		if e.complexity.SiteConnection.Aggregate == nil {
-			break
-		}
-
-		return e.complexity.SiteConnection.Aggregate(childComplexity), true
-
-	case "SiteEdge.node":
-		if e.complexity.SiteEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.SiteEdge.Node(childComplexity), true
-
-	case "SiteEdge.cursor":
-		if e.complexity.SiteEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.SiteEdge.Cursor(childComplexity), true
+		return e.complexity.Query.Converts(childComplexity, args["where"].(*ConvertWhereInput), args["orderBy"].(*ConvertOrderByInput), args["skip"].(*int), args["after"].(*string), args["before"].(*string), args["first"].(*int), args["last"].(*int)), true
 
 	case "User.id":
 		if e.complexity.User.Id == nil {
@@ -780,6 +752,125 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.User.AdvertiserId(childComplexity), true
+
+	case "XpathConvert.id":
+		if e.complexity.XpathConvert.Id == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.Id(childComplexity), true
+
+	case "XpathConvert.advertiserID":
+		if e.complexity.XpathConvert.AdvertiserId == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.AdvertiserId(childComplexity), true
+
+	case "XpathConvert.convertAttribution":
+		if e.complexity.XpathConvert.ConvertAttribution == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.ConvertAttribution(childComplexity), true
+
+	case "XpathConvert.convertDataType":
+		if e.complexity.XpathConvert.ConvertDataType == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.ConvertDataType(childComplexity), true
+
+	case "XpathConvert.convertStatus":
+		if e.complexity.XpathConvert.ConvertStatus == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.ConvertStatus(childComplexity), true
+
+	case "XpathConvert.convertType":
+		if e.complexity.XpathConvert.ConvertType == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.ConvertType(childComplexity), true
+
+	case "XpathConvert.convertValue":
+		if e.complexity.XpathConvert.ConvertValue == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.ConvertValue(childComplexity), true
+
+	case "XpathConvert.convertXpathUrl":
+		if e.complexity.XpathConvert.ConvertXpathUrl == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.ConvertXpathUrl(childComplexity), true
+
+	case "XpathConvert.convertXpathValue":
+		if e.complexity.XpathConvert.ConvertXpathValue == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.ConvertXpathValue(childComplexity), true
+
+	case "XpathConvert.createChannel":
+		if e.complexity.XpathConvert.CreateChannel == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.CreateChannel(childComplexity), true
+
+	case "XpathConvert.createTime":
+		if e.complexity.XpathConvert.CreateTime == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.CreateTime(childComplexity), true
+
+	case "XpathConvert.data":
+		if e.complexity.XpathConvert.Data == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.Data(childComplexity), true
+
+	case "XpathConvert.externalAction":
+		if e.complexity.XpathConvert.ExternalAction == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.ExternalAction(childComplexity), true
+
+	case "XpathConvert.externalActions":
+		if e.complexity.XpathConvert.ExternalActions == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.ExternalActions(childComplexity), true
+
+	case "XpathConvert.name":
+		if e.complexity.XpathConvert.Name == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.Name(childComplexity), true
+
+	case "XpathConvert.status":
+		if e.complexity.XpathConvert.Status == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.Status(childComplexity), true
+
+	case "XpathConvert.statusModifyTime":
+		if e.complexity.XpathConvert.StatusModifyTime == nil {
+			break
+		}
+
+		return e.complexity.XpathConvert.StatusModifyTime(childComplexity), true
 
 	}
 	return 0, false
@@ -827,11 +918,11 @@ type executionContext struct {
 	*executableSchema
 }
 
-var aggregateSiteImplementors = []string{"AggregateSite"}
+var aggregateConvertImplementors = []string{"AggregateConvert"}
 
 // nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _AggregateSite(ctx context.Context, sel ast.SelectionSet, obj *AggregateSite) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, aggregateSiteImplementors)
+func (ec *executionContext) _AggregateConvert(ctx context.Context, sel ast.SelectionSet, obj *AggregateConvert) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, aggregateConvertImplementors)
 
 	out := graphql.NewOrderedMap(len(fields))
 	invalid := false
@@ -840,9 +931,9 @@ func (ec *executionContext) _AggregateSite(ctx context.Context, sel ast.Selectio
 
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("AggregateSite")
+			out.Values[i] = graphql.MarshalString("AggregateConvert")
 		case "count":
-			out.Values[i] = ec._AggregateSite_count(ctx, field, obj)
+			out.Values[i] = ec._AggregateConvert_count(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
@@ -858,11 +949,11 @@ func (ec *executionContext) _AggregateSite(ctx context.Context, sel ast.Selectio
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _AggregateSite_count(ctx context.Context, field graphql.CollectedField, obj *AggregateSite) graphql.Marshaler {
+func (ec *executionContext) _AggregateConvert_count(ctx context.Context, field graphql.CollectedField, obj *AggregateConvert) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer ec.Tracer.EndFieldExecution(ctx)
 	rctx := &graphql.ResolverContext{
-		Object: "AggregateSite",
+		Object: "AggregateConvert",
 		Args:   nil,
 		Field:  field,
 	}
@@ -871,6 +962,639 @@ func (ec *executionContext) _AggregateSite_count(ctx context.Context, field grap
 	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Count, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+var appConvertImplementors = []string{"AppConvert", "Node"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _AppConvert(ctx context.Context, sel ast.SelectionSet, obj *AppConvert) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, appConvertImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AppConvert")
+		case "id":
+			out.Values[i] = ec._AppConvert_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "advertiserID":
+			out.Values[i] = ec._AppConvert_advertiserID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "appId":
+			out.Values[i] = ec._AppConvert_appId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertAttribution":
+			out.Values[i] = ec._AppConvert_convertAttribution(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertDataType":
+			out.Values[i] = ec._AppConvert_convertDataType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertItunesId":
+			out.Values[i] = ec._AppConvert_convertItunesId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertPackageName":
+			out.Values[i] = ec._AppConvert_convertPackageName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertStatus":
+			out.Values[i] = ec._AppConvert_convertStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertType":
+			out.Values[i] = ec._AppConvert_convertType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertValue":
+			out.Values[i] = ec._AppConvert_convertValue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "createChannel":
+			out.Values[i] = ec._AppConvert_createChannel(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "createTime":
+			out.Values[i] = ec._AppConvert_createTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "data":
+			out.Values[i] = ec._AppConvert_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "downloadUrlStatus":
+			out.Values[i] = ec._AppConvert_downloadUrlStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "externalAction":
+			out.Values[i] = ec._AppConvert_externalAction(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "externalActions":
+			out.Values[i] = ec._AppConvert_externalActions(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "name":
+			out.Values[i] = ec._AppConvert_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "status":
+			out.Values[i] = ec._AppConvert_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "statusModifyTime":
+			out.Values[i] = ec._AppConvert_statusModifyTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_id(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalID(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_advertiserID(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AdvertiserID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_appId(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AppID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_convertAttribution(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertAttribution, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_convertDataType(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertDataType, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_convertItunesId(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertItunesID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_convertPackageName(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertPackageName, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_convertStatus(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertStatus, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_convertType(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertType, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_convertValue(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertValue, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_createChannel(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateChannel, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_createTime(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateTime, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalTime(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_data(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_downloadUrlStatus(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DownloadURLStatus, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_externalAction(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExternalAction, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ExternalAction)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return res
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_externalActions(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExternalActions, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_name(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_status(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _AppConvert_statusModifyTime(ctx context.Context, field graphql.CollectedField, obj *AppConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "AppConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StatusModifyTime, nil
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -903,40 +1627,61 @@ func (ec *executionContext) _Convert(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "advertiserID":
-			out.Values[i] = ec._Convert_advertiserID(ctx, field, obj)
-		case "appId":
-			out.Values[i] = ec._Convert_appId(ctx, field, obj)
+		case "advertiserId":
+			out.Values[i] = ec._Convert_advertiserId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "convertAttribution":
 			out.Values[i] = ec._Convert_convertAttribution(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "convertDataType":
 			out.Values[i] = ec._Convert_convertDataType(ctx, field, obj)
-		case "convertItunesId":
-			out.Values[i] = ec._Convert_convertItunesId(ctx, field, obj)
-		case "convertPackageName":
-			out.Values[i] = ec._Convert_convertPackageName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "convertStatus":
 			out.Values[i] = ec._Convert_convertStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "convertType":
 			out.Values[i] = ec._Convert_convertType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "convertValue":
 			out.Values[i] = ec._Convert_convertValue(ctx, field, obj)
-		case "convertXpathUrl":
-			out.Values[i] = ec._Convert_convertXpathUrl(ctx, field, obj)
-		case "convertXpathValue":
-			out.Values[i] = ec._Convert_convertXpathValue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "createChannel":
 			out.Values[i] = ec._Convert_createChannel(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "createTime":
 			out.Values[i] = ec._Convert_createTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "data":
 			out.Values[i] = ec._Convert_data(ctx, field, obj)
-		case "downloadUrlStatus":
-			out.Values[i] = ec._Convert_downloadUrlStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "externalAction":
 			out.Values[i] = ec._Convert_externalAction(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "externalActions":
 			out.Values[i] = ec._Convert_externalActions(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "name":
 			out.Values[i] = ec._Convert_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -944,8 +1689,14 @@ func (ec *executionContext) _Convert(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "status":
 			out.Values[i] = ec._Convert_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		case "statusModifyTime":
 			out.Values[i] = ec._Convert_statusModifyTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -985,7 +1736,7 @@ func (ec *executionContext) _Convert_id(ctx context.Context, field graphql.Colle
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Convert_advertiserID(ctx context.Context, field graphql.CollectedField, obj *Convert) graphql.Marshaler {
+func (ec *executionContext) _Convert_advertiserId(ctx context.Context, field graphql.CollectedField, obj *Convert) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer ec.Tracer.EndFieldExecution(ctx)
 	rctx := &graphql.ResolverContext{
@@ -1000,44 +1751,15 @@ func (ec *executionContext) _Convert_advertiserID(ctx context.Context, field gra
 		return obj.AdvertiserID, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Convert_appId(ctx context.Context, field graphql.CollectedField, obj *Convert) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Convert",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AppID, nil
-	})
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*res)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -1056,16 +1778,15 @@ func (ec *executionContext) _Convert_convertAttribution(ctx context.Context, fie
 		return obj.ConvertAttribution, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -1084,72 +1805,15 @@ func (ec *executionContext) _Convert_convertDataType(ctx context.Context, field 
 		return obj.ConvertDataType, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Convert_convertItunesId(ctx context.Context, field graphql.CollectedField, obj *Convert) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Convert",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ConvertItunesID, nil
-	})
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Convert_convertPackageName(ctx context.Context, field graphql.CollectedField, obj *Convert) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Convert",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ConvertPackageName, nil
-	})
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*res)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -1168,16 +1832,15 @@ func (ec *executionContext) _Convert_convertStatus(ctx context.Context, field gr
 		return obj.ConvertStatus, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -1196,16 +1859,15 @@ func (ec *executionContext) _Convert_convertType(ctx context.Context, field grap
 		return obj.ConvertType, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -1224,72 +1886,15 @@ func (ec *executionContext) _Convert_convertValue(ctx context.Context, field gra
 		return obj.ConvertValue, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Convert_convertXpathUrl(ctx context.Context, field graphql.CollectedField, obj *Convert) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Convert",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ConvertXpathURL, nil
-	})
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Convert_convertXpathValue(ctx context.Context, field graphql.CollectedField, obj *Convert) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Convert",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ConvertXpathValue, nil
-	})
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*res)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -1308,16 +1913,15 @@ func (ec *executionContext) _Convert_createChannel(ctx context.Context, field gr
 		return obj.CreateChannel, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -1336,16 +1940,15 @@ func (ec *executionContext) _Convert_createTime(ctx context.Context, field graph
 		return obj.CreateTime, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*time.Time)
+	res := resTmp.(time.Time)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalTime(*res)
+	return graphql.MarshalTime(res)
 }
 
 // nolint: vetshadow
@@ -1364,44 +1967,15 @@ func (ec *executionContext) _Convert_data(ctx context.Context, field graphql.Col
 		return obj.Data, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Convert_downloadUrlStatus(ctx context.Context, field graphql.CollectedField, obj *Convert) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Convert",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.DownloadURLStatus, nil
-	})
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*int)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
+	return graphql.MarshalString(res)
 }
 
 // nolint: vetshadow
@@ -1420,16 +1994,15 @@ func (ec *executionContext) _Convert_externalAction(ctx context.Context, field g
 		return obj.ExternalAction, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(ExternalAction)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
+	return res
 }
 
 // nolint: vetshadow
@@ -1448,16 +2021,15 @@ func (ec *executionContext) _Convert_externalActions(ctx context.Context, field 
 		return obj.ExternalActions, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalString(*res)
+	return graphql.MarshalString(res)
 }
 
 // nolint: vetshadow
@@ -1503,16 +2075,15 @@ func (ec *executionContext) _Convert_status(ctx context.Context, field graphql.C
 		return obj.Status, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
+	return graphql.MarshalInt(res)
 }
 
 // nolint: vetshadow
@@ -1531,16 +2102,15 @@ func (ec *executionContext) _Convert_statusModifyTime(ctx context.Context, field
 		return obj.StatusModifyTime, nil
 	})
 	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*int)
+	res := resTmp.(int)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	if res == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*res)
+	return graphql.MarshalInt(res)
 }
 
 var convertConnectionImplementors = []string{"ConvertConnection"}
@@ -1692,11 +2262,11 @@ func (ec *executionContext) _ConvertConnection_aggregate(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(AggregateSite)
+	res := resTmp.(AggregateConvert)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	return ec._AggregateSite(ctx, field.Selections, &res)
+	return ec._AggregateConvert(ctx, field.Selections, &res)
 }
 
 var convertEdgeImplementors = []string{"ConvertEdge"}
@@ -1755,11 +2325,11 @@ func (ec *executionContext) _ConvertEdge_node(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(Convert)
+	res := resTmp.(ConvertResult)
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
-	return ec._Convert(ctx, field.Selections, &res)
+	return ec._ConvertResult(ctx, field.Selections, &res)
 }
 
 // nolint: vetshadow
@@ -1812,11 +2382,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
-		case "updateContainer":
-			out.Values[i] = ec._Mutation_updateContainer(ctx, field)
+		case "updateJSConvert":
+			out.Values[i] = ec._Mutation_updateJSConvert(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalid = true
 			}
+		case "deleteJSConvert":
+			out.Values[i] = ec._Mutation_deleteJSConvert(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -1847,7 +2419,7 @@ func (ec *executionContext) _Mutation_createJSConvert(ctx context.Context, field
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateJSConvert(rctx, args["input"].(*JSConvert))
+		return ec.resolvers.Mutation().CreateJSConvert(rctx, args["input"].(*JSCreateInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1863,11 +2435,11 @@ func (ec *executionContext) _Mutation_createJSConvert(ctx context.Context, field
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Mutation_updateContainer(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+func (ec *executionContext) _Mutation_updateJSConvert(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer ec.Tracer.EndFieldExecution(ctx)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := field_Mutation_updateContainer_args(rawArgs)
+	args, err := field_Mutation_updateJSConvert_args(rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -1881,7 +2453,7 @@ func (ec *executionContext) _Mutation_updateContainer(ctx context.Context, field
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateContainer(rctx, args["convertID"].(int), args["convertName"].(*string))
+		return ec.resolvers.Mutation().UpdateJSConvert(rctx, args["input"].(*JSUpdateInput), args["where"].(*ConvertWhereInput))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -1894,6 +2466,41 @@ func (ec *executionContext) _Mutation_updateContainer(ctx context.Context, field
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 
 	return ec._Convert(ctx, field.Selections, &res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _Mutation_deleteJSConvert(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := field_Mutation_deleteJSConvert_args(rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx := &graphql.ResolverContext{
+		Object: "Mutation",
+		Args:   args,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteJSConvert(rctx, args["where"].(*ConvertWhereInput))
+	})
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Convert)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+
+	if res == nil {
+		return graphql.Null
+	}
+
+	return ec._Convert(ctx, field.Selections, res)
 }
 
 var pageInfoImplementors = []string{"PageInfo"}
@@ -2064,24 +2671,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "viewer":
-			wg.Add(1)
-			go func(i int, field graphql.CollectedField) {
-				out.Values[i] = ec._Query_viewer(ctx, field)
-				if out.Values[i] == graphql.Null {
-					invalid = true
-				}
-				wg.Done()
-			}(i, field)
-		case "sites":
-			wg.Add(1)
-			go func(i int, field graphql.CollectedField) {
-				out.Values[i] = ec._Query_sites(ctx, field)
-				if out.Values[i] == graphql.Null {
-					invalid = true
-				}
-				wg.Done()
-			}(i, field)
 		case "converts":
 			wg.Add(1)
 			go func(i int, field graphql.CollectedField) {
@@ -2107,68 +2696,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 }
 
 // nolint: vetshadow
-func (ec *executionContext) _Query_viewer(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Query",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Viewer(rctx)
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(User)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	return ec._User(ctx, field.Selections, &res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Query_sites(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := field_Query_sites_args(rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	rctx := &graphql.ResolverContext{
-		Object: "Query",
-		Args:   args,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Sites(rctx, args["type"].(*SiteType), args["skip"].(*int), args["after"].(*string), args["before"].(*string), args["first"].(*int), args["last"].(*int))
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(SiteConnection)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	return ec._SiteConnection(ctx, field.Selections, &res)
-}
-
-// nolint: vetshadow
 func (ec *executionContext) _Query_converts(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
 	ctx = ec.Tracer.StartFieldExecution(ctx, field)
 	defer ec.Tracer.EndFieldExecution(ctx)
@@ -2187,7 +2714,7 @@ func (ec *executionContext) _Query_converts(ctx context.Context, field graphql.C
 	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
 	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Converts(rctx, args["type"].(*SiteType), args["skip"].(*int), args["after"].(*string), args["before"].(*string), args["first"].(*int), args["last"].(*int))
+		return ec.resolvers.Query().Converts(rctx, args["where"].(*ConvertWhereInput), args["orderBy"].(*ConvertOrderByInput), args["skip"].(*int), args["after"].(*string), args["before"].(*string), args["first"].(*int), args["last"].(*int))
 	})
 	if resTmp == nil {
 		if !ec.HasError(rctx) {
@@ -2264,450 +2791,6 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	}
 
 	return ec.___Schema(ctx, field.Selections, res)
-}
-
-var siteImplementors = []string{"Site", "Node"}
-
-// nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _Site(ctx context.Context, sel ast.SelectionSet, obj *Site) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, siteImplementors)
-
-	out := graphql.NewOrderedMap(len(fields))
-	invalid := false
-	for i, field := range fields {
-		out.Keys[i] = field.Alias
-
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Site")
-		case "id":
-			out.Values[i] = ec._Site_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "url":
-			out.Values[i] = ec._Site_url(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "name":
-			out.Values[i] = ec._Site_name(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "image":
-			out.Values[i] = ec._Site_image(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "createAt":
-			out.Values[i] = ec._Site_createAt(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-
-	if invalid {
-		return graphql.Null
-	}
-	return out
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Site_id(ctx context.Context, field graphql.CollectedField, obj *Site) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Site",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalID(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Site_url(ctx context.Context, field graphql.CollectedField, obj *Site) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Site",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalString(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Site_name(ctx context.Context, field graphql.CollectedField, obj *Site) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Site",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalString(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Site_image(ctx context.Context, field graphql.CollectedField, obj *Site) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Site",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Image, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalString(res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _Site_createAt(ctx context.Context, field graphql.CollectedField, obj *Site) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "Site",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreateAt, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(time.Time)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalTime(res)
-}
-
-var siteConnectionImplementors = []string{"SiteConnection"}
-
-// nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _SiteConnection(ctx context.Context, sel ast.SelectionSet, obj *SiteConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, siteConnectionImplementors)
-
-	var wg sync.WaitGroup
-	out := graphql.NewOrderedMap(len(fields))
-	invalid := false
-	for i, field := range fields {
-		out.Keys[i] = field.Alias
-
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SiteConnection")
-		case "edges":
-			wg.Add(1)
-			go func(i int, field graphql.CollectedField) {
-				out.Values[i] = ec._SiteConnection_edges(ctx, field, obj)
-				if out.Values[i] == graphql.Null {
-					invalid = true
-				}
-				wg.Done()
-			}(i, field)
-		case "pageInfo":
-			wg.Add(1)
-			go func(i int, field graphql.CollectedField) {
-				out.Values[i] = ec._SiteConnection_pageInfo(ctx, field, obj)
-				if out.Values[i] == graphql.Null {
-					invalid = true
-				}
-				wg.Done()
-			}(i, field)
-		case "aggregate":
-			wg.Add(1)
-			go func(i int, field graphql.CollectedField) {
-				out.Values[i] = ec._SiteConnection_aggregate(ctx, field, obj)
-				if out.Values[i] == graphql.Null {
-					invalid = true
-				}
-				wg.Done()
-			}(i, field)
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	wg.Wait()
-	if invalid {
-		return graphql.Null
-	}
-	return out
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _SiteConnection_edges(ctx context.Context, field graphql.CollectedField, obj *SiteConnection) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "SiteConnection",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.SiteConnection().Edges(rctx, obj)
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]SiteEdge)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	arr1 := make(graphql.Array, len(res))
-	var wg sync.WaitGroup
-
-	isLen1 := len(res) == 1
-	if !isLen1 {
-		wg.Add(len(res))
-	}
-
-	for idx1 := range res {
-		idx1 := idx1
-		rctx := &graphql.ResolverContext{
-			Index:  &idx1,
-			Result: &res[idx1],
-		}
-		ctx := graphql.WithResolverContext(ctx, rctx)
-		f := func(idx1 int) {
-			if !isLen1 {
-				defer wg.Done()
-			}
-			arr1[idx1] = func() graphql.Marshaler {
-
-				return ec._SiteEdge(ctx, field.Selections, &res[idx1])
-			}()
-		}
-		if isLen1 {
-			f(idx1)
-		} else {
-			go f(idx1)
-		}
-
-	}
-	wg.Wait()
-	return arr1
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _SiteConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *SiteConnection) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "SiteConnection",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.SiteConnection().PageInfo(rctx, obj)
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(PageInfo)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	return ec._PageInfo(ctx, field.Selections, &res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _SiteConnection_aggregate(ctx context.Context, field graphql.CollectedField, obj *SiteConnection) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "SiteConnection",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.SiteConnection().Aggregate(rctx, obj)
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(AggregateSite)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	return ec._AggregateSite(ctx, field.Selections, &res)
-}
-
-var siteEdgeImplementors = []string{"SiteEdge"}
-
-// nolint: gocyclo, errcheck, gas, goconst
-func (ec *executionContext) _SiteEdge(ctx context.Context, sel ast.SelectionSet, obj *SiteEdge) graphql.Marshaler {
-	fields := graphql.CollectFields(ctx, sel, siteEdgeImplementors)
-
-	out := graphql.NewOrderedMap(len(fields))
-	invalid := false
-	for i, field := range fields {
-		out.Keys[i] = field.Alias
-
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SiteEdge")
-		case "node":
-			out.Values[i] = ec._SiteEdge_node(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		case "cursor":
-			out.Values[i] = ec._SiteEdge_cursor(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalid = true
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-
-	if invalid {
-		return graphql.Null
-	}
-	return out
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _SiteEdge_node(ctx context.Context, field graphql.CollectedField, obj *SiteEdge) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "SiteEdge",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(Site)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-
-	return ec._Site(ctx, field.Selections, &res)
-}
-
-// nolint: vetshadow
-func (ec *executionContext) _SiteEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *SiteEdge) graphql.Marshaler {
-	ctx = ec.Tracer.StartFieldExecution(ctx, field)
-	defer ec.Tracer.EndFieldExecution(ctx)
-	rctx := &graphql.ResolverContext{
-		Object: "SiteEdge",
-		Args:   nil,
-		Field:  field,
-	}
-	ctx = graphql.WithResolverContext(ctx, rctx)
-	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
-	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Cursor, nil
-	})
-	if resTmp == nil {
-		if !ec.HasError(rctx) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	rctx.Result = res
-	ctx = ec.Tracer.StartFieldChildExecution(ctx)
-	return graphql.MarshalID(res)
 }
 
 var userImplementors = []string{"User"}
@@ -2797,6 +2880,575 @@ func (ec *executionContext) _User_advertiserID(ctx context.Context, field graphq
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return graphql.MarshalID(res)
+}
+
+var xpathConvertImplementors = []string{"XpathConvert", "Node"}
+
+// nolint: gocyclo, errcheck, gas, goconst
+func (ec *executionContext) _XpathConvert(ctx context.Context, sel ast.SelectionSet, obj *XpathConvert) graphql.Marshaler {
+	fields := graphql.CollectFields(ctx, sel, xpathConvertImplementors)
+
+	out := graphql.NewOrderedMap(len(fields))
+	invalid := false
+	for i, field := range fields {
+		out.Keys[i] = field.Alias
+
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("XpathConvert")
+		case "id":
+			out.Values[i] = ec._XpathConvert_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "advertiserID":
+			out.Values[i] = ec._XpathConvert_advertiserID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertAttribution":
+			out.Values[i] = ec._XpathConvert_convertAttribution(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertDataType":
+			out.Values[i] = ec._XpathConvert_convertDataType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertStatus":
+			out.Values[i] = ec._XpathConvert_convertStatus(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertType":
+			out.Values[i] = ec._XpathConvert_convertType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertValue":
+			out.Values[i] = ec._XpathConvert_convertValue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertXpathUrl":
+			out.Values[i] = ec._XpathConvert_convertXpathUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "convertXpathValue":
+			out.Values[i] = ec._XpathConvert_convertXpathValue(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "createChannel":
+			out.Values[i] = ec._XpathConvert_createChannel(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "createTime":
+			out.Values[i] = ec._XpathConvert_createTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "data":
+			out.Values[i] = ec._XpathConvert_data(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "externalAction":
+			out.Values[i] = ec._XpathConvert_externalAction(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "externalActions":
+			out.Values[i] = ec._XpathConvert_externalActions(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "name":
+			out.Values[i] = ec._XpathConvert_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "status":
+			out.Values[i] = ec._XpathConvert_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		case "statusModifyTime":
+			out.Values[i] = ec._XpathConvert_statusModifyTime(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalid = true
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+
+	if invalid {
+		return graphql.Null
+	}
+	return out
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_id(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalID(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_advertiserID(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AdvertiserID, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_convertAttribution(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertAttribution, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_convertDataType(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertDataType, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_convertStatus(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertStatus, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_convertType(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertType, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_convertValue(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertValue, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_convertXpathUrl(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertXpathURL, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_convertXpathValue(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConvertXpathValue, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_createChannel(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateChannel, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_createTime(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateTime, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalTime(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_data(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_externalAction(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExternalAction, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ExternalAction)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return res
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_externalActions(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ExternalActions, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_name(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalString(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_status(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
+}
+
+// nolint: vetshadow
+func (ec *executionContext) _XpathConvert_statusModifyTime(ctx context.Context, field graphql.CollectedField, obj *XpathConvert) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer ec.Tracer.EndFieldExecution(ctx)
+	rctx := &graphql.ResolverContext{
+		Object: "XpathConvert",
+		Args:   nil,
+		Field:  field,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, obj, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StatusModifyTime, nil
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return graphql.MarshalInt(res)
 }
 
 var __DirectiveImplementors = []string{"__Directive"}
@@ -4245,6 +4897,27 @@ func (ec *executionContext) _ConvertInput(ctx context.Context, sel ast.Selection
 	}
 }
 
+func (ec *executionContext) _ConvertResult(ctx context.Context, sel ast.SelectionSet, obj *ConvertResult) graphql.Marshaler {
+	switch obj := (*obj).(type) {
+	case nil:
+		return graphql.Null
+	case Convert:
+		return ec._Convert(ctx, sel, &obj)
+	case *Convert:
+		return ec._Convert(ctx, sel, obj)
+	case AppConvert:
+		return ec._AppConvert(ctx, sel, &obj)
+	case *AppConvert:
+		return ec._AppConvert(ctx, sel, obj)
+	case XpathConvert:
+		return ec._XpathConvert(ctx, sel, &obj)
+	case *XpathConvert:
+		return ec._XpathConvert(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj *Node) graphql.Marshaler {
 	switch obj := (*obj).(type) {
 	case nil:
@@ -4253,17 +4926,105 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 		return ec._Convert(ctx, sel, &obj)
 	case *Convert:
 		return ec._Convert(ctx, sel, obj)
-	case Site:
-		return ec._Site(ctx, sel, &obj)
-	case *Site:
-		return ec._Site(ctx, sel, obj)
+	case AppConvert:
+		return ec._AppConvert(ctx, sel, &obj)
+	case *AppConvert:
+		return ec._AppConvert(ctx, sel, obj)
+	case XpathConvert:
+		return ec._XpathConvert(ctx, sel, &obj)
+	case *XpathConvert:
+		return ec._XpathConvert(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
 }
 
-func UnmarshalJSConvert(v interface{}) (JSConvert, error) {
-	var it JSConvert
+func UnmarshalConvertWhereInput(v interface{}) (ConvertWhereInput, error) {
+	var it ConvertWhereInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalID(v)
+				it.ID = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			var ptr1 string
+			if v != nil {
+				ptr1, err = graphql.UnmarshalString(v)
+				it.Name = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "advertiserID":
+			var err error
+			it.AdvertiserID, err = graphql.UnmarshalID(v)
+			if err != nil {
+				return it, err
+			}
+		case "createTime":
+			var err error
+			var ptr1 time.Time
+			if v != nil {
+				ptr1, err = graphql.UnmarshalTime(v)
+				it.CreateTime = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+			var ptr1 int
+			if v != nil {
+				ptr1, err = graphql.UnmarshalInt(v)
+				it.Status = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "externalAction":
+			var err error
+			var ptr1 ExternalAction
+			if v != nil {
+				err = (&ptr1).UnmarshalGQL(v)
+				it.ExternalAction = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		case "convertTrack":
+			var err error
+			var ptr1 ConvertTrack
+			if v != nil {
+				err = (&ptr1).UnmarshalGQL(v)
+				it.ConvertTrack = &ptr1
+			}
+
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func UnmarshalJSCreateInput(v interface{}) (JSCreateInput, error) {
+	var it JSCreateInput
 	var asMap = v.(map[string]interface{})
 
 	for k, v := range asMap {
@@ -4276,12 +5037,25 @@ func UnmarshalJSConvert(v interface{}) (JSConvert, error) {
 			}
 		case "externalAction":
 			var err error
-			var ptr1 ExternalAction
-			if v != nil {
-				err = (&ptr1).UnmarshalGQL(v)
-				it.ExternalAction = &ptr1
+			err = (&it.ExternalAction).UnmarshalGQL(v)
+			if err != nil {
+				return it, err
 			}
+		}
+	}
 
+	return it, nil
+}
+
+func UnmarshalJSUpdateInput(v interface{}) (JSUpdateInput, error) {
+	var it JSUpdateInput
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "name":
+			var err error
+			it.Name, err = graphql.UnmarshalString(v)
 			if err != nil {
 				return it, err
 			}
@@ -4316,14 +5090,39 @@ func (ec *executionContext) introspectType(name string) *introspection.Type {
 
 var parsedSchema = gqlparser.MustLoadSchema(
 	&ast.Source{Name: "schema.graphql", Input: `type Query {
-  viewer: User!
-  sites(type: SiteType = TETRIS, skip: Int, after: String, before: String, first: Int, last: Int): SiteConnection!
-  converts(type: SiteType = TETRIS, skip: Int, after: String, before: String, first: Int, last: Int): ConvertConnection!
+  converts(where: ConvertWhereInput, orderBy: ConvertOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ConvertConnection!
 }
 
 type Mutation {
-  createJSConvert(input: JSConvert): Convert!
-  updateContainer(convertID: Int!, convertName: String):Convert!
+  createJSConvert(input: JSCreateInput): Convert!
+  updateJSConvert(input: JSUpdateInput,  where: ConvertWhereInput ):Convert!
+  deleteJSConvert(where: ConvertWhereInput ):Convert
+}
+
+enum ConvertOrderByInput {
+  id_ASC
+  id_DESC
+  createdTime_ASC
+  createdTime_DESC
+}
+
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+type AggregateConvert {
+  count: Int!
+}
+
+# 转化跟踪方式
+enum ConvertTrack {
+  All
+  JS
+  Xpath
+  API
 }
 
 # 转化目标
@@ -4343,10 +5142,7 @@ enum ExternalAction{
 
 }
 
-enum SiteType {
-  TETRIS
-  TEMAI
-}
+
 
 interface Node {
   id: ID!
@@ -4356,84 +5152,106 @@ interface Node {
 type Convert implements Node{
   id: ID!
 
-  advertiserID: Int
-  appId: String
-  convertAttribution: Int
-  convertDataType: Int
-  convertItunesId: Int
-  convertPackageName: String
-  convertStatus: Int
-  convertType: Int
-  convertValue: Int
-  convertXpathUrl: String
-  convertXpathValue: String
-  createChannel: Int
-  createTime: Time
-  data: String
-  downloadUrlStatus: Int
-  externalAction: Int
-  externalActions: String
+  advertiserId: Int!
+  convertAttribution: Int!
+  convertDataType: Int!
+  convertStatus: Int!
+  convertType: Int!
+  convertValue: Int!
+  createChannel: Int! #   标志创建来源
+  createTime: Time!
+  data: String!
+  externalAction: ExternalAction!
+  externalActions: String!
   name: String!
-  status: Int
-  statusModifyTime: Int
+  status: Int!
+  statusModifyTime: Int!
 }
+
+type AppConvert implements Node {
+  id: ID!
+
+  advertiserID: Int!
+  appId: String!  #游戏深度转化app_id
+  convertAttribution: Int!
+  convertDataType: Int!
+  convertItunesId: Int!
+  convertPackageName: String!
+  convertStatus: Int!
+  convertType: Int!
+  convertValue: Int!
+  createChannel: Int!  #   标志创建来源
+  createTime: Time!
+  data: String!
+  downloadUrlStatus: Int!
+  externalAction: ExternalAction!
+  externalActions: String!
+  name: String!
+  status: Int!
+  statusModifyTime: Int!
+}
+
+type XpathConvert implements Node{
+  id: ID!
+
+  advertiserID: Int!
+  convertAttribution: Int!
+  convertDataType: Int!
+  convertStatus: Int!
+  convertType: Int!
+  convertValue: Int!
+  convertXpathUrl: String!
+  convertXpathValue: String!
+  createChannel: Int!  #   标志创建来源
+  createTime: Time!
+  data: String!
+  externalAction: ExternalAction!
+  externalActions: String!
+  name: String!
+  status: Int!
+  statusModifyTime: Int!
+}
+
+union ConvertResult = Convert | AppConvert | XpathConvert
 
 interface ConvertInput{
   name: String!
   externalAction: ExternalAction
 }
-input JSConvert {
+
+## input 不能使用 implements
+input JSCreateInput {
   name: String!
-  externalAction: ExternalAction
+  externalAction: ExternalAction!
 }
+input JSUpdateInput{
+  name: String!
+}
+input ConvertWhereInput {
+  id: ID
+  name: String
+  advertiserID: ID!
+  createTime: Time
+  status: Int
+  externalAction: ExternalAction
+  convertTrack: ConvertTrack  # 转化跟踪类型
+}
+
+
 
 type ConvertConnection {
   edges: [ConvertEdge!]!
   pageInfo: PageInfo!
-  aggregate: AggregateSite!
+  aggregate: AggregateConvert!
 }
 type ConvertEdge{
-  node: Convert!
+  node: ConvertResult!
   cursor: ID!
 }
 
 type User {
   id: ID!
   advertiserID: ID!
-}
-
-
-
-type SiteConnection {
-  edges: [SiteEdge!]!
-  pageInfo: PageInfo!
-  aggregate: AggregateSite!
-}
-
-type SiteEdge {
-  node: Site!
-  cursor: ID!
-}
-
-type Site implements Node {
-  id: ID!
-  url: String!
-  name: String!
-  image: String!
-  createAt: Time!
-}
-
-type AggregateSite {
-  count: Int!
-}
-
-
-
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-  endCursor: String
 }
 
 scalar Time

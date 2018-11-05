@@ -9,54 +9,92 @@ import (
 	time "time"
 )
 
-type AggregateSite struct {
+type AggregateConvert struct {
 	Count int `json:"count"`
 }
 
-type Convert struct {
-	ID                 string     `json:"id"`
-	AdvertiserID       *int       `json:"advertiserID"`
-	AppID              *string    `json:"appId"`
-	ConvertAttribution *int       `json:"convertAttribution"`
-	ConvertDataType    *int       `json:"convertDataType"`
-	ConvertItunesID    *int       `json:"convertItunesId"`
-	ConvertPackageName *string    `json:"convertPackageName"`
-	ConvertStatus      *int       `json:"convertStatus"`
-	ConvertType        *int       `json:"convertType"`
-	ConvertValue       *int       `json:"convertValue"`
-	ConvertXpathURL    *string    `json:"convertXpathUrl"`
-	ConvertXpathValue  *string    `json:"convertXpathValue"`
-	CreateChannel      *int       `json:"createChannel"`
-	CreateTime         *time.Time `json:"createTime"`
-	Data               *string    `json:"data"`
-	DownloadURLStatus  *int       `json:"downloadUrlStatus"`
-	ExternalAction     *int       `json:"externalAction"`
-	ExternalActions    *string    `json:"externalActions"`
-	Name               string     `json:"name"`
-	Status             *int       `json:"status"`
-	StatusModifyTime   *int       `json:"statusModifyTime"`
+type AppConvert struct {
+	ID                 string         `json:"id"`
+	AdvertiserID       int            `json:"advertiserID"`
+	AppID              string         `json:"appId"`
+	ConvertAttribution int            `json:"convertAttribution"`
+	ConvertDataType    int            `json:"convertDataType"`
+	ConvertItunesID    int            `json:"convertItunesId"`
+	ConvertPackageName string         `json:"convertPackageName"`
+	ConvertStatus      int            `json:"convertStatus"`
+	ConvertType        int            `json:"convertType"`
+	ConvertValue       int            `json:"convertValue"`
+	CreateChannel      int            `json:"createChannel"`
+	CreateTime         time.Time      `json:"createTime"`
+	Data               string         `json:"data"`
+	DownloadURLStatus  int            `json:"downloadUrlStatus"`
+	ExternalAction     ExternalAction `json:"externalAction"`
+	ExternalActions    string         `json:"externalActions"`
+	Name               string         `json:"name"`
+	Status             int            `json:"status"`
+	StatusModifyTime   int            `json:"statusModifyTime"`
 }
 
-func (Convert) IsNode() {}
+func (AppConvert) IsNode()          {}
+func (AppConvert) IsConvertResult() {}
+
+type Convert struct {
+	ID                 string         `json:"id"`
+	AdvertiserID       int            `json:"advertiserId"`
+	ConvertAttribution int            `json:"convertAttribution"`
+	ConvertDataType    int            `json:"convertDataType"`
+	ConvertStatus      int            `json:"convertStatus"`
+	ConvertType        int            `json:"convertType"`
+	ConvertValue       int            `json:"convertValue"`
+	CreateChannel      int            `json:"createChannel"`
+	CreateTime         time.Time      `json:"createTime"`
+	Data               string         `json:"data"`
+	ExternalAction     ExternalAction `json:"externalAction"`
+	ExternalActions    string         `json:"externalActions"`
+	Name               string         `json:"name"`
+	Status             int            `json:"status"`
+	StatusModifyTime   int            `json:"statusModifyTime"`
+}
+
+func (Convert) IsNode()          {}
+func (Convert) IsConvertResult() {}
 
 type ConvertConnection struct {
-	Edges     []ConvertEdge `json:"edges"`
-	PageInfo  PageInfo      `json:"pageInfo"`
-	Aggregate AggregateSite `json:"aggregate"`
+	Edges     []ConvertEdge    `json:"edges"`
+	PageInfo  PageInfo         `json:"pageInfo"`
+	Aggregate AggregateConvert `json:"aggregate"`
 }
 
 type ConvertEdge struct {
-	Node   Convert `json:"node"`
-	Cursor string  `json:"cursor"`
+	Node   ConvertResult `json:"node"`
+	Cursor string        `json:"cursor"`
 }
 
 type ConvertInput interface {
 	IsConvertInput()
 }
 
-type JSConvert struct {
-	Name           string          `json:"name"`
+type ConvertResult interface {
+	IsConvertResult()
+}
+
+type ConvertWhereInput struct {
+	ID             *string         `json:"id"`
+	Name           *string         `json:"name"`
+	AdvertiserID   string          `json:"advertiserID"`
+	CreateTime     *time.Time      `json:"createTime"`
+	Status         *int            `json:"status"`
 	ExternalAction *ExternalAction `json:"externalAction"`
+	ConvertTrack   *ConvertTrack   `json:"convertTrack"`
+}
+
+type JSCreateInput struct {
+	Name           string         `json:"name"`
+	ExternalAction ExternalAction `json:"externalAction"`
+}
+
+type JSUpdateInput struct {
+	Name string `json:"name"`
 }
 
 type Node interface {
@@ -70,24 +108,108 @@ type PageInfo struct {
 	EndCursor       *string `json:"endCursor"`
 }
 
-type Site struct {
-	ID       string    `json:"id"`
-	URL      string    `json:"url"`
-	Name     string    `json:"name"`
-	Image    string    `json:"image"`
-	CreateAt time.Time `json:"createAt"`
-}
-
-func (Site) IsNode() {}
-
-type SiteEdge struct {
-	Node   Site   `json:"node"`
-	Cursor string `json:"cursor"`
-}
-
 type User struct {
 	ID           string `json:"id"`
 	AdvertiserID string `json:"advertiserID"`
+}
+
+type XpathConvert struct {
+	ID                 string         `json:"id"`
+	AdvertiserID       int            `json:"advertiserID"`
+	ConvertAttribution int            `json:"convertAttribution"`
+	ConvertDataType    int            `json:"convertDataType"`
+	ConvertStatus      int            `json:"convertStatus"`
+	ConvertType        int            `json:"convertType"`
+	ConvertValue       int            `json:"convertValue"`
+	ConvertXpathURL    string         `json:"convertXpathUrl"`
+	ConvertXpathValue  string         `json:"convertXpathValue"`
+	CreateChannel      int            `json:"createChannel"`
+	CreateTime         time.Time      `json:"createTime"`
+	Data               string         `json:"data"`
+	ExternalAction     ExternalAction `json:"externalAction"`
+	ExternalActions    string         `json:"externalActions"`
+	Name               string         `json:"name"`
+	Status             int            `json:"status"`
+	StatusModifyTime   int            `json:"statusModifyTime"`
+}
+
+func (XpathConvert) IsNode()          {}
+func (XpathConvert) IsConvertResult() {}
+
+type ConvertOrderByInput string
+
+const (
+	ConvertOrderByInputIdAsc           ConvertOrderByInput = "id_ASC"
+	ConvertOrderByInputIdDesc          ConvertOrderByInput = "id_DESC"
+	ConvertOrderByInputCreatedTimeAsc  ConvertOrderByInput = "createdTime_ASC"
+	ConvertOrderByInputCreatedTimeDesc ConvertOrderByInput = "createdTime_DESC"
+)
+
+func (e ConvertOrderByInput) IsValid() bool {
+	switch e {
+	case ConvertOrderByInputIdAsc, ConvertOrderByInputIdDesc, ConvertOrderByInputCreatedTimeAsc, ConvertOrderByInputCreatedTimeDesc:
+		return true
+	}
+	return false
+}
+
+func (e ConvertOrderByInput) String() string {
+	return string(e)
+}
+
+func (e *ConvertOrderByInput) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ConvertOrderByInput(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ConvertOrderByInput", str)
+	}
+	return nil
+}
+
+func (e ConvertOrderByInput) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ConvertTrack string
+
+const (
+	ConvertTrackAll   ConvertTrack = "All"
+	ConvertTrackJs    ConvertTrack = "JS"
+	ConvertTrackXpath ConvertTrack = "Xpath"
+	ConvertTrackApi   ConvertTrack = "API"
+)
+
+func (e ConvertTrack) IsValid() bool {
+	switch e {
+	case ConvertTrackAll, ConvertTrackJs, ConvertTrackXpath, ConvertTrackApi:
+		return true
+	}
+	return false
+}
+
+func (e ConvertTrack) String() string {
+	return string(e)
+}
+
+func (e *ConvertTrack) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ConvertTrack(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ConvertTrack", str)
+	}
+	return nil
+}
+
+func (e ConvertTrack) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
 type ExternalAction string
@@ -133,41 +255,5 @@ func (e *ExternalAction) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ExternalAction) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type SiteType string
-
-const (
-	SiteTypeTetris SiteType = "TETRIS"
-	SiteTypeTemai  SiteType = "TEMAI"
-)
-
-func (e SiteType) IsValid() bool {
-	switch e {
-	case SiteTypeTetris, SiteTypeTemai:
-		return true
-	}
-	return false
-}
-
-func (e SiteType) String() string {
-	return string(e)
-}
-
-func (e *SiteType) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = SiteType(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid SiteType", str)
-	}
-	return nil
-}
-
-func (e SiteType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

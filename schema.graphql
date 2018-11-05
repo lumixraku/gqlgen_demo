@@ -1,12 +1,37 @@
 type Query {
-  viewer: User!
-  sites(type: SiteType = TETRIS, skip: Int, after: String, before: String, first: Int, last: Int): SiteConnection!
-  converts(type: SiteType = TETRIS, skip: Int, after: String, before: String, first: Int, last: Int): ConvertConnection!
+  converts(where: ConvertWhereInput, orderBy: ConvertOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ConvertConnection!
 }
 
 type Mutation {
-  createJSConvert(input: JSConvert): Convert!
-  updateContainer(convertID: Int!, convertName: String):Convert!
+  createJSConvert(input: JSCreateInput): Convert!
+  updateJSConvert(input: JSUpdateInput,  where: ConvertWhereInput ):Convert!
+  deleteJSConvert(where: ConvertWhereInput ):Convert
+}
+
+enum ConvertOrderByInput {
+  id_ASC
+  id_DESC
+  createdTime_ASC
+  createdTime_DESC
+}
+
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+type AggregateConvert {
+  count: Int!
+}
+
+# 转化跟踪方式
+enum ConvertTrack {
+  All
+  JS
+  Xpath
+  API
 }
 
 # 转化目标
@@ -26,10 +51,7 @@ enum ExternalAction{
 
 }
 
-enum SiteType {
-  TETRIS
-  TEMAI
-}
+
 
 interface Node {
   id: ID!
@@ -39,84 +61,106 @@ interface Node {
 type Convert implements Node{
   id: ID!
 
-  advertiserID: Int
-  appId: String
-  convertAttribution: Int
-  convertDataType: Int
-  convertItunesId: Int
-  convertPackageName: String
-  convertStatus: Int
-  convertType: Int
-  convertValue: Int
-  convertXpathUrl: String
-  convertXpathValue: String
-  createChannel: Int
-  createTime: Time
-  data: String
-  downloadUrlStatus: Int
-  externalAction: Int
-  externalActions: String
+  advertiserId: Int!
+  convertAttribution: Int!
+  convertDataType: Int!
+  convertStatus: Int!
+  convertType: Int!
+  convertValue: Int!
+  createChannel: Int! #   标志创建来源
+  createTime: Time!
+  data: String!
+  externalAction: ExternalAction!
+  externalActions: String!
   name: String!
-  status: Int
-  statusModifyTime: Int
+  status: Int!
+  statusModifyTime: Int!
 }
+
+type AppConvert implements Node {
+  id: ID!
+
+  advertiserID: Int!
+  appId: String!  #游戏深度转化app_id
+  convertAttribution: Int!
+  convertDataType: Int!
+  convertItunesId: Int!
+  convertPackageName: String!
+  convertStatus: Int!
+  convertType: Int!
+  convertValue: Int!
+  createChannel: Int!  #   标志创建来源
+  createTime: Time!
+  data: String!
+  downloadUrlStatus: Int!
+  externalAction: ExternalAction!
+  externalActions: String!
+  name: String!
+  status: Int!
+  statusModifyTime: Int!
+}
+
+type XpathConvert implements Node{
+  id: ID!
+
+  advertiserID: Int!
+  convertAttribution: Int!
+  convertDataType: Int!
+  convertStatus: Int!
+  convertType: Int!
+  convertValue: Int!
+  convertXpathUrl: String!
+  convertXpathValue: String!
+  createChannel: Int!  #   标志创建来源
+  createTime: Time!
+  data: String!
+  externalAction: ExternalAction!
+  externalActions: String!
+  name: String!
+  status: Int!
+  statusModifyTime: Int!
+}
+
+union ConvertResult = Convert | AppConvert | XpathConvert
 
 interface ConvertInput{
   name: String!
   externalAction: ExternalAction
 }
-input JSConvert {
+
+## input 不能使用 implements
+input JSCreateInput {
   name: String!
-  externalAction: ExternalAction
+  externalAction: ExternalAction!
 }
+input JSUpdateInput{
+  name: String!
+}
+input ConvertWhereInput {
+  id: ID
+  name: String
+  advertiserID: ID!
+  createTime: Time
+  status: Int
+  externalAction: ExternalAction
+  convertTrack: ConvertTrack  # 转化跟踪类型
+}
+
+
 
 type ConvertConnection {
   edges: [ConvertEdge!]!
   pageInfo: PageInfo!
-  aggregate: AggregateSite!
+  aggregate: AggregateConvert!
 }
 type ConvertEdge{
-  node: Convert!
+  node: ConvertResult!
   cursor: ID!
 }
 
 type User {
   id: ID!
   advertiserID: ID!
-}
-
-
-
-type SiteConnection {
-  edges: [SiteEdge!]!
-  pageInfo: PageInfo!
-  aggregate: AggregateSite!
-}
-
-type SiteEdge {
-  node: Site!
-  cursor: ID!
-}
-
-type Site implements Node {
-  id: ID!
-  url: String!
-  name: String!
-  image: String!
-  createAt: Time!
-}
-
-type AggregateSite {
-  count: Int!
-}
-
-
-
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-  endCursor: String
 }
 
 scalar Time

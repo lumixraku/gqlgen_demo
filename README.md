@@ -107,4 +107,68 @@ mutation{
   }
 }
 
-```  this is ok
+```
+
+
+
+
+## 关于继承
+可以查看 meteor 分支
+
+schema
+```
+union ConvertResult = Convert | AppConvert | XpathConvert
+type ConvertEdge{
+  node: ConvertResult!
+  cursor: ID!
+}
+
+
+```
+在 go 的实现中， ConvertResult是一个接口
+然后之前定义的type Convert  AppConvert  XpathConvert 都实现了这个接口
+
+```
+type ConvertResult interface {
+	IsConvertResult()
+}
+
+
+
+type AppConvert struct{...}
+func (AppConvert) IsConvertResult() {}
+```
+
+查询的话要这么做
+```
+# mutation {
+#   createJSConvert(input: {
+#     name:"xxx",
+#     externalAction:Phone
+#   }) {
+#     id
+#   }
+# }
+
+query {
+  converts(where: {
+    advertiserID: "123"
+  }){
+    edges{
+      node{
+        ... on XpathConvert{
+          id
+          convertXpathUrl
+        }
+        ... on Convert{
+          id
+        }
+        ...on AppConvert{
+          id
+          appId
+        }
+      }
+    }
+  }
+}
+```
